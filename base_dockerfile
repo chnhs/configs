@@ -25,9 +25,11 @@ RUN sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/maste
     chsh -s $(which zsh)
 
 # open ssh
-RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&\
+RUN wget -O /tmp/sshd_config https://raw.githubusercontent.com/chnhs/configs/refs/heads/main/sshd_config &&\
+    cp /tmp/sshd_config /etc/ssh/sshd_config &&\
     mkdir /var/run/sshd &&\
-    echo 'root:your_password_here' | chpasswd
+    echo 'root:123456' | chpasswd
+EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
 
 # install python
