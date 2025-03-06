@@ -29,3 +29,12 @@ RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh
     mkdir /var/run/sshd &&\
     echo 'root:your_password_here' | chpasswd
 CMD ["/usr/sbin/sshd", "-D"]
+
+# install python
+ARG PYTHON_VERSION='your_python_version_here'
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get -y update && \
+    apt-get install -y python${PYTHON_VERSION} && \
+    apt-get install -y python${PYTHON_VERSION}-distutils && \
+    wget https://bootstrap.pypa.io/get-pip.py && python${PYTHON_VERSION} get-pip.py && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1
