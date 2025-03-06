@@ -1,0 +1,31 @@
+FROM 'your_base_image_here'
+
+# change source
+ENV DEBIAN_FRONTEND=noninteractive
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g' /etc/apt/sources.list && \
+    apt-get clean -y && \
+    apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    unzip \
+    wget \
+    software-properties-common \
+    git \
+    vim \
+    curl \
+    zsh \
+    openssh-server
+
+# install zsh
+RUN sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/master/install.sh)" &&\
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions &&\
+    git clone https://gitee.com/Annihilater/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting &&\
+    wget -O /tmp/.zshrc https://raw.githubusercontent.com/chnhs/configs/refs/heads/main/zsh_config &&\
+    cp /tmp/.zshrc ~/.zshrc &&\
+    chsh -s $(which zsh)
+
+# open ssh
+RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&\
+    mkdir /var/run/sshd &&\
+    echo 'root:your_password_here' | chpasswd
+CMD ["/usr/sbin/sshd", "-D"]
